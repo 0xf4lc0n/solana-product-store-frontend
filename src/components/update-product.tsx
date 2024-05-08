@@ -1,43 +1,30 @@
-"use client";
-
-import * as web3 from "@solana/web3.js";
-import BN from "bn.js";
 import { Product } from "@/models/product";
 import { PROGRAM_ID, getConnection, getSigner } from "@/utils/common";
 import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { useState } from "react";
+import * as web3 from "@solana/web3.js";
+import BN from "bn.js";
 
-export function AddProduct() {
-  const [id, setId] = useState(0);
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState(0.0);
+export function UpdateProduct(props: { product: Product }) {
+  const [name, setName] = useState(props.product.name);
   const seller = getSigner();
 
   function handleSubmit(event: any) {
     event.preventDefault();
-    const product = new Product(seller.publicKey, id, name, price);
+    const op = props.product;
+    const product = new Product(op.seller, op.id, name, op.price);
     handleTransactionSubmit(product);
   }
 
-  async function handleTransactionSubmit(product: Product) {
-    const buffer = product.serialize(0);
+  async function handleTransactionSubmit(newProduct: Product) {
+    const buffer = newProduct.serialize(1);
     const transaction = new web3.Transaction();
 
     const [product_pda] = await web3.PublicKey.findProgramAddress(
       [
         seller.publicKey.toBuffer(),
-        new BN(product.id).toArrayLike(Buffer, "be", 8),
+        new BN(newProduct.id).toArrayLike(Buffer, "be", 8),
       ],
-      new web3.PublicKey(PROGRAM_ID),
-    );
-
-    const [pdaCounter] = await web3.PublicKey.findProgramAddress(
-      [product_pda.toBuffer(), Buffer.from("price")],
-      new web3.PublicKey(PROGRAM_ID),
-    );
-
-    const [pdaPrice] = await web3.PublicKey.findProgramAddress(
-      [product_pda.toBuffer(), new BN(0).toArrayLike(Buffer, "be", 8)],
       new web3.PublicKey(PROGRAM_ID),
     );
 
@@ -50,16 +37,6 @@ export function AddProduct() {
         },
         {
           pubkey: product_pda,
-          isSigner: false,
-          isWritable: true,
-        },
-        {
-          pubkey: pdaCounter,
-          isSigner: false,
-          isWritable: true,
-        },
-        {
-          pubkey: pdaPrice,
           isSigner: false,
           isWritable: true,
         },
@@ -103,33 +80,16 @@ export function AddProduct() {
     >
       <form onSubmit={handleSubmit}>
         <FormControl isRequired>
-          <FormLabel color="gray.200">Product Id</FormLabel>
-          <Input
-            id="title"
-            color="gray.400"
-            onChange={(event) => setId(parseInt(event.currentTarget.value))}
-          />
-        </FormControl>
-        <FormControl isRequired>
           <FormLabel color="gray.200">Product name</FormLabel>
           <Input
             id="title"
             color="gray.400"
             onChange={(event) => setName(event.currentTarget.value)}
-          />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel color="gray.200">Product price</FormLabel>
-          <Input
-            id="title"
-            color="gray.400"
-            onChange={(event) =>
-              setPrice(parseFloat(event.currentTarget.value))
-            }
+            defaultValue={props.product.name}
           />
         </FormControl>
         <Button width="full" mt={4} type="submit">
-          Submit product
+          Update product
         </Button>
       </form>
     </Box>

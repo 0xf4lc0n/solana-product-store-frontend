@@ -7,7 +7,7 @@ export class ProductCoordinator {
   static accounts: web3.PublicKey[] = [];
 
   static async prefetchAccounts(connection: web3.Connection, search: string) {
-    const offset = 4 + 7 + 1 + 32 + 4;
+    const offset = 4 + 7 + 1 + 32 + 8 + 4;
     const accounts = await connection.getProgramAccounts(
       new web3.PublicKey(PROGRAM_ID),
       {

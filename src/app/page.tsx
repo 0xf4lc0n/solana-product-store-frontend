@@ -1,6 +1,6 @@
 import { AddProduct } from "@/components/add-product";
 import { ProductList } from "@/components/product-list";
-import { Box, Center, Heading } from "@chakra-ui/react";
+import { Box, Center, ChakraProvider, Heading } from "@chakra-ui/react";
 import Head from "next/head";
 
 export default function Home() {
