@@ -1,6 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import * as borsh from "@project-serum/borsh";
 import BN from "bn.js";
+import { PROGRAM_ID } from "@/utils/common";
 
 export class Product {
   seller: PublicKey;
@@ -13,6 +14,15 @@ export class Product {
     this.id = new BN(id);
     this.name = name;
     this.price = price;
+  }
+
+  async publicKey(): Promise<PublicKey> {
+    return (
+      await PublicKey.findProgramAddress(
+        [this.seller.toBuffer(), new BN(this.id).toArrayLike(Buffer, "be", 8)],
+        new PublicKey(PROGRAM_ID),
+      )
+    )[0];
   }
 
   borshInstructionSchema = borsh.struct([

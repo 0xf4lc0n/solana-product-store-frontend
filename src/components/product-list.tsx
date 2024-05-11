@@ -27,6 +27,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { UpdateProduct } from "./update-product";
+import { UpdatePrice } from "./update-price";
 
 export function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -101,6 +102,7 @@ export function ProductList() {
             <h1>Update product data</h1>
             <UpdateProduct product={selectedProduct!} />
             <h1>Change product price</h1>
+            <UpdatePrice product={selectedProduct!} />
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
