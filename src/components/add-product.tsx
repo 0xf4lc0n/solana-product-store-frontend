@@ -6,17 +6,25 @@ import { Product } from "@/models/product";
 import { PROGRAM_ID, getConnection, getSigner } from "@/utils/common";
 import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { useState } from "react";
+import { ProductCoordinator } from "@/coordinators/product-coordinator";
 
 export function AddProduct() {
-  const [id, setId] = useState(0);
+  //const [id, setId] = useState(0);
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0.0);
   const seller = getSigner();
 
   function handleSubmit(event: any) {
     event.preventDefault();
-    const product = new Product(seller.publicKey, id, name, price);
-    handleTransactionSubmit(product);
+    //TODO: Fetch product ID
+
+    ProductCoordinator.syncPriceCount(getConnection(), seller.publicKey).then(
+      async (count) => {
+        console.log("Product count: ", count);
+        const product = new Product(seller.publicKey, count + 1, name, price);
+        await handleTransactionSubmit(product);
+      },
+    );
   }
 
   async function handleTransactionSubmit(product: Product) {
@@ -28,6 +36,11 @@ export function AddProduct() {
         seller.publicKey.toBuffer(),
         new BN(product.id).toArrayLike(Buffer, "be", 8),
       ],
+      new web3.PublicKey(PROGRAM_ID),
+    );
+
+    const [pdaProductCounter] = await web3.PublicKey.findProgramAddress(
+      [seller.publicKey.toBuffer(), Buffer.from("product_counter")],
       new web3.PublicKey(PROGRAM_ID),
     );
 
@@ -50,6 +63,11 @@ export function AddProduct() {
         },
         {
           pubkey: product_pda,
+          isSigner: false,
+          isWritable: true,
+        },
+        {
+          pubkey: pdaProductCounter,
           isSigner: false,
           isWritable: true,
         },
@@ -102,14 +120,6 @@ export function AddProduct() {
       justifyContent="center"
     >
       <form onSubmit={handleSubmit}>
-        <FormControl isRequired>
-          <FormLabel color="gray.200">Product Id</FormLabel>
-          <Input
-            id="title"
-            color="gray.400"
-            onChange={(event) => setId(parseInt(event.currentTarget.value))}
-          />
-        </FormControl>
         <FormControl isRequired>
           <FormLabel color="gray.200">Product name</FormLabel>
           <Input

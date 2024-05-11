@@ -31,6 +31,11 @@ export function UpdatePrice(props: { product: Product }) {
 
     const productPda = newPrice.product;
 
+    const [pdaProductCounter] = await web3.PublicKey.findProgramAddress(
+      [seller.publicKey.toBuffer(), Buffer.from("product_counter")],
+      new web3.PublicKey(PROGRAM_ID),
+    );
+
     const [pdaCounter] = await web3.PublicKey.findProgramAddress(
       [productPda.toBuffer(), Buffer.from("price")],
       new web3.PublicKey(PROGRAM_ID),
@@ -57,6 +62,11 @@ export function UpdatePrice(props: { product: Product }) {
           pubkey: productPda,
           isSigner: false,
           isWritable: true,
+        },
+        {
+          pubkey: pdaProductCounter,
+          isSigner: false,
+          isWritable: false,
         },
         {
           pubkey: pdaCounter,

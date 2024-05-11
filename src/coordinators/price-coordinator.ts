@@ -3,7 +3,6 @@ import { PROGRAM_ID } from "@/utils/common";
 import * as borsh from "@project-serum/borsh";
 import * as web3 from "@solana/web3.js";
 import BN from "bn.js";
-import { PHASE_PRODUCTION_BUILD } from "next/dist/shared/lib/constants";
 
 export class PriceCoordinator {
   static priceCount: number = 0;

@@ -29,7 +29,7 @@ export class Product {
 
   borshInstructionSchema = borsh.struct([
     borsh.u8("variant"),
-    borsh.u64("id"),
+    //borsh.u64("id"),
     borsh.str("name"),
     borsh.f64("price"),
     borsh.str("timestamp"),
