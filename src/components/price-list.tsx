@@ -47,7 +47,9 @@ export function PriceList(props: { product: Product }) {
           borderWidth={1}
           margin={2}
         >
-          <div>{price.price}</div>
+          <div>
+            {price.price} {price.timestamp.toString()}
+          </div>
         </Box>
       ))}
 

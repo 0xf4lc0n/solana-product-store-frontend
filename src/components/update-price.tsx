@@ -22,7 +22,7 @@ export function UpdatePrice(props: { product: Product }) {
   async function handleSubmit(event: any) {
     event.preventDefault();
     const productKey = await props.product.publicKey();
-    handleTransactionSubmit(new Price(productKey, price, 0));
+    handleTransactionSubmit(new Price(productKey, price, new Date()));
   }
 
   async function handleTransactionSubmit(newPrice: Price) {

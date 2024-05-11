@@ -5,17 +5,18 @@ import BN from "bn.js";
 export class Price {
   product: PublicKey;
   price: number;
-  timestamp: number;
+  timestamp: Date;
 
-  constructor(product: PublicKey, price: number, timestamp: number) {
+  constructor(product: PublicKey, price: number, timestamp: Date) {
     this.product = product;
     this.price = price;
-    this.timestamp = new BN(timestamp);
+    this.timestamp = timestamp;
   }
 
   borshChangePriceInstructionSchema = borsh.struct([
     borsh.u8("variant"),
     borsh.f64("price"),
+    borsh.str("timestamp"),
   ]);
 
   static borshAccountSchema = borsh.struct([
@@ -23,14 +24,14 @@ export class Price {
     borsh.bool("initialized"),
     borsh.publicKey("product"),
     borsh.f64("price"),
-    borsh.i64("timestamp"),
+    borsh.str("timestamp"),
   ]);
 
   serialize(): Buffer {
     const buffer = Buffer.alloc(1000);
 
     this.borshChangePriceInstructionSchema.encode(
-      { ...this, variant: 2 },
+      { ...this, variant: 2, timestamp: this.timestamp.getTime().toString() },
       buffer,
     );
 
@@ -48,7 +49,8 @@ export class Price {
     try {
       const { product, price, timestamp } =
         this.borshAccountSchema.decode(buffer);
-      return new Price(product, price, timestamp);
+
+      return new Price(product, price, new Date(Number(timestamp)));
     } catch (e) {
       console.log("Deserialize error: ", e);
       console.log(buffer);

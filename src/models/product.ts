@@ -8,12 +8,14 @@ export class Product {
   id: number;
   name: string;
   price: number;
+  timestamp: string;
 
   constructor(seller: PublicKey, id: number, name: string, price: number) {
     this.seller = seller;
     this.id = new BN(id);
     this.name = name;
     this.price = price;
+    this.timestamp = new Date().getTime().toString();
   }
 
   async publicKey(): Promise<PublicKey> {
@@ -30,6 +32,7 @@ export class Product {
     borsh.u64("id"),
     borsh.str("name"),
     borsh.f64("price"),
+    borsh.str("timestamp"),
   ]);
 
   borshUpdateInstructionSchema = borsh.struct([
