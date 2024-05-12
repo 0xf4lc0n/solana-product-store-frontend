@@ -6,7 +6,6 @@ import {
   Button,
   Center,
   HStack,
-  Heading,
   Input,
   Modal,
   ModalBody,
@@ -25,20 +24,44 @@ import {
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UpdateProduct } from "./update-product";
 import { UpdatePrice } from "./update-price";
 
 export function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
+  const allProducts = useRef<Product[]>([]);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    ProductCoordinator.fetchPage(getConnection(), page, 10).then(setProducts);
+    const setUp = async () => {
+      const products = await ProductCoordinator.fetchPage(
+        getConnection(),
+        page,
+        10
+      );
+      const sortedProducts = products.sort((p1, p2) => p1.id - p2.id);
+      setProducts(sortedProducts);
+      allProducts.current = sortedProducts;
+    };
+
+    setUp();
   }, [page]);
+
+  useEffect(() => {
+    if (search) {
+      setProducts((products) =>
+        products.filter((p) =>
+          p.name.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+    } else {
+      setProducts(allProducts.current);
+    }
+  }, [search]);
 
   return (
     <div>
@@ -74,7 +97,7 @@ export function ProductList() {
               >
                 <Td>{product.id.toString()}</Td>
                 <Td>{product.name}</Td>
-                <Td>{product.price}</Td>
+                <Td>{product.price}$</Td>
               </Tr>
             ))}
           </Tbody>
@@ -96,16 +119,16 @@ export function ProductList() {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Product details</ModalHeader>
+          <ModalHeader>
+            Product details - <b>{selectedProduct?.name}</b>
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <h1>Update product data</h1>
-            <UpdateProduct product={selectedProduct!} />
             <h1>Change product price</h1>
             <UpdatePrice product={selectedProduct!} />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
+            <Button mr={3} onClick={onClose}>
               Close
             </Button>
           </ModalFooter>

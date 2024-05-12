@@ -24,13 +24,13 @@ export function PriceList(props: { product: Product }) {
           getConnection(),
           product,
           page,
-          10,
+          10
         );
         setPrices(prices);
       });
     };
     fetch();
-  }, [page]);
+  }, [page, props.product]);
 
   return (
     <div>
@@ -48,7 +48,7 @@ export function PriceList(props: { product: Product }) {
           margin={2}
         >
           <div>
-            {price.price} {price.timestamp.toString()}
+            {price.price}$ - {price.timestamp.toUTCString()}
           </div>
         </Box>
       ))}

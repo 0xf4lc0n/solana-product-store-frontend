@@ -37,3 +37,4 @@ next-env.d.ts
 
 # Secrets
 common.tsx
+common.ts
